@@ -54,6 +54,7 @@ protected:
 	// Recursive ray tracing can be slow.  Add a toggle to disable, to allow you to manipulate the scene
 	bool                    mDoIndirectGI = true;
 	bool                    mDoDirectGI = true;
+	bool					mDoNEE = true;
 
 	int32_t                 mUserSpecifiedRayDepth = 1;   ///<  What is the current maximum ray depth
 	const int32_t           mMaxPossibleRayDepth = 8;     ///<  The largest ray depth we support (without recompile)

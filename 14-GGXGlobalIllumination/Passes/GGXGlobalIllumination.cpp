@@ -79,6 +79,7 @@ void GGXGlobalIlluminationPass::renderGui(Gui* pGui)
 		                            mDoDirectGI);
 	dirty |= (int)pGui->addCheckBox(mDoIndirectGI ? "Shooting global illumination rays" : "Skipping global illumination", 
 		                            mDoIndirectGI);
+	dirty |= (int)pGui->addCheckBox(mDoNEE ? "Use next event estimation" : "No next event estimation", mDoNEE);
 	if (dirty) setRefreshFlag();
 }
 
@@ -99,6 +100,7 @@ void GGXGlobalIlluminationPass::execute(RenderContext* pRenderContext)
 	globalVars["GlobalCB"]["gDoDirectGI"]   = mDoDirectGI;
 	globalVars["GlobalCB"]["gMaxDepth"]     = mUserSpecifiedRayDepth;
     globalVars["GlobalCB"]["gEmitMult"]     = 1.0f;
+	globalVars["GlobalCB"]["gDoNEE"]		= mDoNEE;
 	globalVars["gPos"]         = mpResManager->getTexture("WorldPosition");
 	globalVars["gNorm"]        = mpResManager->getTexture("WorldNormal");
 	globalVars["gDiffuseMatl"] = mpResManager->getTexture("MaterialDiffuse");

@@ -103,43 +103,45 @@ float3 lambertianIndirect(inout uint rndSeed, float3 hit, float3 norm, float3 di
 float3 ggxDirect(inout uint rndSeed, float3 hit, float3 N, float3 V, float3 dif, float3 spec, float rough)
 {
 	// Pick a random light from our scene to shoot a shadow ray towards
+	
+		float3 finColor = float3(0, 0, 0);
+		for (int i = 0; i < gLightsCount; i++) {
+			// Query the scene to find info about the randomly selected light
+			//int lightToSample = min(int(nextRand(rndSeed) * gLightsCount), gLightsCount - 1);
+			int lightToSample = i;
+			float distToLight;
+			float3 lightIntensity;
+			float3 L;
+			getLightData(lightToSample, hit, L, lightIntensity, distToLight);
 
-	float3 finColor = float3(0, 0, 0);
-	for (int i = 0; i < gLightsCount; i++) {
-		// Query the scene to find info about the randomly selected light
-		int lightToSample = i;
-		float distToLight;
-		float3 lightIntensity;
-		float3 L;
-		getLightData(lightToSample, hit, L, lightIntensity, distToLight);
+			// Compute our lambertion term (N dot L)
+			float NdotL = saturate(dot(N, L));
 
-		// Compute our lambertion term (N dot L)
-		float NdotL = saturate(dot(N, L));
+			// Shoot our shadow ray to our randomly selected light
+			float shadowMult = float(gLightsCount) * shadowRayVisibility(hit, L, gMinT, distToLight);
 
-		// Shoot our shadow ray to our randomly selected light
-		float shadowMult = float(gLightsCount) * shadowRayVisibility(hit, L, gMinT, distToLight);
+			// Compute half vectors and additional dot products for GGX
+			float3 H = normalize(V + L);
+			float NdotH = saturate(dot(N, H));
+			float LdotH = saturate(dot(L, H));
+			float NdotV = saturate(dot(N, V));
 
-		// Compute half vectors and additional dot products for GGX
-		float3 H = normalize(V + L);
-		float NdotH = saturate(dot(N, H));
-		float LdotH = saturate(dot(L, H));
-		float NdotV = saturate(dot(N, V));
+			// Evaluate terms for our GGX BRDF model
+			float  D = ggxNormalDistribution(NdotH, rough);
+			float  G = ggxSchlickMaskingTerm(NdotL, NdotV, rough);
+			float3 F = schlickFresnel(spec, LdotH);
 
-		// Evaluate terms for our GGX BRDF model
-		float  D = ggxNormalDistribution(NdotH, rough);
-		float  G = ggxSchlickMaskingTerm(NdotL, NdotV, rough);
-		float3 F = schlickFresnel(spec, LdotH);
+			// Evaluate the Cook-Torrance Microfacet BRDF model
+			//     Cancel out NdotL here & the next eq. to avoid catastrophic numerical precision issues.
+			float3 ggxTerm = D * G*F / (4 * NdotV /* * NdotL */);
 
-		// Evaluate the Cook-Torrance Microfacet BRDF model
-		//     Cancel out NdotL here & the next eq. to avoid catastrophic numerical precision issues.
-		float3 ggxTerm = D * G*F / (4 * NdotV /* * NdotL */);
-
-		// Compute our final color (combining diffuse lobe plus specular GGX lobe)
-		finColor += shadowMult * lightIntensity * ( /* NdotL * */ ggxTerm + NdotL * dif / M_PI);
-	}
-	return finColor / gLightsCount;
-
+			// Compute our final color (combining diffuse lobe plus specular GGX lobe)
+			finColor += shadowMult * lightIntensity * ( /* NdotL * */ ggxTerm + NdotL * dif / M_PI);
+		}
+		return finColor / gLightsCount;
+	//}
 }
+
 float3 ggxIndirect(inout uint rndSeed, float3 hit, float3 N, float3 noNormalN, float3 V, float3 dif, float3 spec, float rough, uint rayDepth)
 {
 	// We have to decide whether we sample our diffuse or specular/ggx lobe.

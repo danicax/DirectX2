@@ -35,6 +35,7 @@ shared cbuffer GlobalCB
 	bool  gDoDirectGI;     // A boolean determining if we should compute direct lighting
 	uint  gMaxDepth;       // Maximum number of recursive bounces to allow
     float gEmitMult;       // Multiply emissive amount by this factor (set to 1, usually)
+	bool  gDoNEE;
 }
 
 // Input and out textures that need to be set by the C++ code (for the ray gen shader)

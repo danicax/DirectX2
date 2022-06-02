@@ -82,6 +82,7 @@ void SimpleDiffuseGIPass::renderGui(Gui* pGui)
 	dirty |= (int)pGui->addCheckBox(mDoIndirectGI ? "Shooting global illumination rays" : "Skipping global illumination", 
 		                            mDoIndirectGI);
 	dirty |= (int)pGui->addCheckBox(mDoCosSampling ? "Use cosine sampling" : "Use uniform sampling", mDoCosSampling);
+
 	if (dirty) setRefreshFlag();
 }
 
