@@ -217,6 +217,11 @@ void IndirectClosestHit(inout IndirectRayPayload rayData, BuiltInTriangleInterse
     }
 
 	// Do indirect illumination at this hit location (if we haven't traversed too far)
+	float q = max(rayData.color.x, rayData.color.y);
+	q = max(q, rayData.color.z);
+	q = 1 - min(q, 1);
+	float tempRand = nextRand(rayData.rndSeed);
+	//if (tempRand > q)
 	if (rayData.rayDepth < gMaxDepth)
 	{
 		// Use the same normal for the normal-mapped and non-normal mapped vectors... This means we could get light
