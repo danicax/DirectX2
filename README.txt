@@ -1,3 +1,5 @@
+https://www.youtube.com/watch?v=rVSWnur5oQw
+
 This directory contains Chris Wyman's shader tutorials from the SIGGRAPH 2018 Course 
 "Introduction to DirectX Raytracing."   Please visit the course webpage (http://intro-to-dxr.cwyman.org)
 or Chris' webpage (http://cwyman.org) to get more details, updated code, more descriptive
